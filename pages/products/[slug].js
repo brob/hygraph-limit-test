@@ -46,9 +46,10 @@ async function getProduct(slug, preview) {
 }
 
 export async function getStaticProps({ params, preview = false }) {
+    console.time()
     const data = await getProduct( params.slug, preview)  
-    console.log({data})
-    return await data
+    console.timeEnd()
+    return data
 }
 
 export default function Page({ product, reviews, preview }) {
