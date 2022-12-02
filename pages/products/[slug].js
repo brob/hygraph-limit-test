@@ -37,10 +37,9 @@ async function getProduct(slug, preview) {
 
             const reviews = { href: '#', average: 4, totalCount: 117 }
             resolve( {
-                props: { product, reviews, preview },
-                revalidate: 60,
+                props: { product, reviews, preview }
             })
-        }, 200)
+        }, 100)
         
     })
 }
