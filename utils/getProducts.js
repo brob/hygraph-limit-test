@@ -73,12 +73,13 @@ export async function getProductBySlug(slug, preview=false) {
     }
       `
         try {
-            hygraphClient.setHeader('Authorization', `Bearer ${process.env.HYGRAPH_DEV_AUTH_TOKEN}`)
+                hygraphClient.setHeader('Authorization', `Bearer ${process.env.HYGRAPH_DEV_AUTH_TOKEN}`)
 
-            let {product} = await hygraphClient.request(query, {slug, stage: preview ? 'DRAFT' : 'PUBLISHED'})
+                let {product} = await hygraphClient.request(query, {slug, stage: preview ? 'DRAFT' : 'PUBLISHED'})
+    
+                console.log({product})
+                return product
 
-            console.log({product})
-            return product
         } catch (error) {
             console.log(error)
         }

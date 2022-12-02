@@ -30,15 +30,25 @@ export async function getStaticPaths() {
     return { paths, fallback: false }
 }
 
+async function getProduct(slug, preview) {
+    return new Promise((resolve,reject) => {
+        setTimeout(async () => {
+            const product = await getProductBySlug(slug, preview)
+
+            const reviews = { href: '#', average: 4, totalCount: 117 }
+            resolve( {
+                props: { product, reviews, preview },
+                revalidate: 60,
+            })
+        }, 500)
+        
+    })
+}
+
 export async function getStaticProps({ params, preview = false }) {
-
-    const product = await getProductBySlug(params.slug, preview)
-
-    const reviews = { href: '#', average: 4, totalCount: 117 }
-    return {
-        props: { product, reviews, preview },
-        revalidate: 60,
-    }
+    const data = await getProduct( params.slug, preview)  
+    console.log({data})
+    return await data
 }
 
 export default function Page({ product, reviews, preview }) {
