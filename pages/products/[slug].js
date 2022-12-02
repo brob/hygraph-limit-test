@@ -40,7 +40,7 @@ async function getProduct(slug, preview) {
                 props: { product, reviews, preview },
                 revalidate: 60,
             })
-        }, 500)
+        }, 200)
         
     })
 }
