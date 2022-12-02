@@ -1,5 +1,5 @@
 import hygraphClient, { gql } from './hygraph-client.js'
-import pThrottle from 'p-throttle'
+import { throttledFetch } from './throttle.js'
 // TODO: get this from hygraph instead
 // Average review.rating for a product
 function averageRating(reviews) {
@@ -62,15 +62,7 @@ export async function allProducts() {
 
 
 }
-const throttle = pThrottle({limit: 5,
-	interval: 1000})
-const throttledFetch = throttle(async (...args) => {
-    const [query, vars] = args
 
-    const data = await hygraphClient.request(query, vars)
-
-    return data
-})
 export async function getThrottledProductBySlug(slug) {
     const query = gql`query GetSingleBike($slug: String!) {
       product(where: {slug: $slug}) {
