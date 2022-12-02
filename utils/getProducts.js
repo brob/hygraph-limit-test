@@ -1,5 +1,5 @@
 import hygraphClient, { gql } from './hygraph-client.js'
-
+import pThrottle from 'p-throttle'
 // TODO: get this from hygraph instead
 // Average review.rating for a product
 function averageRating(reviews) {
@@ -62,10 +62,18 @@ export async function allProducts() {
 
 
 }
+const throttle = pThrottle({limit: 5,
+	interval: 1000})
+const throttledFetch = throttle(async (...args) => {
+    const [query, vars] = args
 
-export async function getProductBySlug(slug, preview=false) {
-    const query = gql`query GetSingleBike($slug: String!, $stage: Stage!) {
-      product(where: {slug: $slug}, stage: $stage) {
+    const data = await hygraphClient.request(query, vars)
+
+    return data
+})
+export async function getThrottledProductBySlug(slug) {
+    const query = gql`query GetSingleBike($slug: String!) {
+      product(where: {slug: $slug}) {
         name
         slug
         
@@ -75,9 +83,8 @@ export async function getProductBySlug(slug, preview=false) {
         try {
                 hygraphClient.setHeader('Authorization', `Bearer ${process.env.HYGRAPH_DEV_AUTH_TOKEN}`)
 
-                let {product} = await hygraphClient.request(query, {slug, stage: preview ? 'DRAFT' : 'PUBLISHED'})
+                let {product} = await throttledFetch(query, {slug})
     
-                console.log({product})
                 return product
 
         } catch (error) {
@@ -85,6 +92,28 @@ export async function getProductBySlug(slug, preview=false) {
         }
 }
   
+
+export async function getProductBySlug(slug) {
+    const query = gql`query GetSingleBike($slug: String!) {
+      product(where: {slug: $slug}) {
+        name
+        slug
+        
+      }
+    }
+      `
+        try {
+                hygraphClient.setHeader('Authorization', `Bearer ${process.env.HYGRAPH_DEV_AUTH_TOKEN}`)
+
+                let {product} = await hygraphClient.request(query, {slug})
+
+    
+                return product
+
+        } catch (error) {
+            console.log(error)
+        }
+}
 
 export async function getPreviewProductBySlug(slug) {
   const data = getProductBySlug(slug, true)

@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import React from 'react';
 import { Lightbox } from "react-modal-image";
-import { allProducts, getProductBySlug } from '../../utils/getProducts'
+import { allProducts, getThrottledProductBySlug } from '../../utils/getProducts'
 import { StarIcon } from '@heroicons/react/20/solid'
 import Head from 'next/head'
 import pThrottle from 'p-throttle'
@@ -30,37 +30,14 @@ export async function getStaticPaths() {
     return { paths, fallback: false }
 }
 
-async function getItem(slug, preview) {
-    return new Promise((resolve,reject) => {
-        setTimeout(async () => {
-            const product = await getProductBySlug(slug, preview)
-
-            const reviews = { href: '#', average: 4, totalCount: 117 }
-            resolve( {
-                props: { product, reviews, preview }
-            })
-        }, 100)
-        
-    })
-}
-const throttle = pThrottle({limit: 5,
-	interval: 1000})
-const throttledFetch = throttle( async (slug, preview) => {
-
-    const product = await getProductBySlug(slug, preview)
-
-            const reviews = { href: '#', average: 4, totalCount: 117 }
-            return  {
-                props: { product, reviews, preview }
-            }
-})
-
 export async function getStaticProps({ params, preview = false }) {
     console.time()
     // const data = await getItem(params.slug, preview)  
-    const data = await throttledFetch(params.slug, preview)
+    const data = await getThrottledProductBySlug(params.slug, preview)
     console.timeEnd()
-    return data
+    return {
+        props: {data, preview}
+    }
 }
 
 export default function Page({ product, reviews, preview }) {
