@@ -6,7 +6,7 @@ import { Lightbox } from "react-modal-image";
 import { allProducts, getProductBySlug } from '../../utils/getProducts'
 import { StarIcon } from '@heroicons/react/20/solid'
 import Head from 'next/head'
-
+import pThrottle from 'p-throttle'
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
@@ -30,7 +30,7 @@ export async function getStaticPaths() {
     return { paths, fallback: false }
 }
 
-async function getProduct(slug, preview) {
+async function getItem(slug, preview) {
     return new Promise((resolve,reject) => {
         setTimeout(async () => {
             const product = await getProductBySlug(slug, preview)
@@ -43,10 +43,22 @@ async function getProduct(slug, preview) {
         
     })
 }
+const throttle = pThrottle({limit: 5,
+	interval: 1000})
+const throttledFetch = throttle( async (slug, preview) => {
+
+    const product = await getProductBySlug(slug, preview)
+
+            const reviews = { href: '#', average: 4, totalCount: 117 }
+            return  {
+                props: { product, reviews, preview }
+            }
+})
 
 export async function getStaticProps({ params, preview = false }) {
     console.time()
-    const data = await getProduct( params.slug, preview)  
+    // const data = await getItem(params.slug, preview)  
+    const data = await throttledFetch(params.slug, preview)
     console.timeEnd()
     return data
 }
