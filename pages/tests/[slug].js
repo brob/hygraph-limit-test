@@ -1,4 +1,4 @@
-import { allProducts } from '../../utils/getProducts'
+import { allProducts, getThrottledProductBySlug } from '../../utils/getProducts'
 import hygraphClient, { gql } from '../../utils/hygraph-client';
 import pThrottle from 'p-throttle'
 
@@ -16,23 +16,15 @@ const throttledFetch = throttle(async (query, slug,) => {
 
   return product
 })
-
-export async function getStaticProps({ params }) {
+export async function getStaticProps({ params, preview = false }) {
   console.time()
-  const query = gql`query GetSingleBike($slug: String!) {
-        product(where: {slug: $slug}) {
-          name
-          slug
-        }
-      }
-        `
-  const product = await throttledFetch(query, params.slug)
+  // const data = await getItem(params.slug, preview)  
+  const product = await getThrottledProductBySlug(params.slug)
   console.timeEnd()
   return {
-    props: product
+      props: {product}
   }
 }
-
 export default function Page({product}) {
   return (<>
     <h1>{product.name}</h1>

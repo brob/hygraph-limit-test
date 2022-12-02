@@ -1,26 +1,8 @@
 // Product detail pages generated from utils/getProducts.js
 // Path: /pages/products/[slug].js
-import Image from 'next/image'
 import React from 'react';
-import { Lightbox } from "react-modal-image";
 import { allProducts, getThrottledProductBySlug } from '../../utils/getProducts'
-import { StarIcon } from '@heroicons/react/20/solid'
 import Head from 'next/head'
-import pThrottle from 'p-throttle'
-function classNames(...classes) {
-    return classes.filter(Boolean).join(' ')
-}
-
-function FeaturedImage({aspectWidth, aspectHeight, src}) {
-    // const [open, setOpen] = React.useState(false)
-    // const onClose = () => {
-    //     setOpen(false)
-    //   };
-    return (<div className={`flex imageWrap block aspect-w-${aspectWidth} aspect-h-${aspectHeight} overflow-hidden rounded-lg`}>
-            <img src={src} className="object-cover object-center" />
-        </div>
-    )
-}
 
 export async function getStaticPaths() {
     const products = await allProducts()
@@ -71,9 +53,7 @@ export default function Page({ product, reviews, preview }) {
                 {/* Description and details */}
                 <div>
                     <h3 className="sr-only">Description</h3>
-                    <div className="mb-10" dangerouslySetInnerHTML={{__html: product?.description}}></div>
-                    
-                    
+                    <div className="mb-10" dangerouslySetInnerHTML={{__html: product?.description}}></div>              
                 </div>
             </div>
         </div>

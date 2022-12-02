@@ -82,9 +82,9 @@ export async function getThrottledProductBySlug(slug) {
       `
         try {
                 hygraphClient.setHeader('Authorization', `Bearer ${process.env.HYGRAPH_DEV_AUTH_TOKEN}`)
-
                 let {product} = await throttledFetch(query, {slug})
-    
+                console.log({product})
+
                 return product
 
         } catch (error) {
